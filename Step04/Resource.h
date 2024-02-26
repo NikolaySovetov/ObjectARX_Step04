@@ -1,7 +1,7 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
 // Used by Step04.rc
-//
+
 #define IDS_PROJNAME 100
 
 // Next default values for new objects
