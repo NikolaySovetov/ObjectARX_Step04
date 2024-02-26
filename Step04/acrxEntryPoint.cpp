@@ -3,6 +3,7 @@
 //-----------------------------------------------------------------------------
 #include "StdAfx.h"
 #include "resource.h"
+#include "utilities.h"
 
 //-----------------------------------------------------------------------------
 #define szRDS _RXST("")
@@ -39,10 +40,28 @@ public:
 	virtual void RegisterServerComponents () {
 	}
 
+	static void Step04_addentry() {
+
+		// 2 Get the Named Objects Dictionary
+
+		// 3 Check if the "EMPLOYEE_DICTIONARY" is already in the NOD
+
+	}
+
+	static void Step04_listentries() {
+
+	}
+
+	static void Step04_removeentry() {
+
+	}
+
 };
 
 //-----------------------------------------------------------------------------
 IMPLEMENT_ARX_ENTRYPOINT(CStep04App)
 
-//ACED_ARXCOMMAND_ENTRY_AUTO(CStep04App, MyGroup, MyCommand, MyCommandLocal, ACRX_CMD_MODAL, NULL)
+ACED_ARXCOMMAND_ENTRY_AUTO(CStep04App, Step04, _addentry, addentry, ACRX_CMD_TRANSPARENT, NULL)
+ACED_ARXCOMMAND_ENTRY_AUTO(CStep04App, Step04, _listentries, listentries, ACRX_CMD_TRANSPARENT, NULL)
+ACED_ARXCOMMAND_ENTRY_AUTO(CStep04App, Step04, _removeentry, removeentry, ACRX_CMD_TRANSPARENT, NULL)
 
