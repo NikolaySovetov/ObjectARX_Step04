@@ -45,8 +45,12 @@ public:
 		const TCHAR* dictName{ L"EMPLOYEE_DICTIONARY" };
 		AcDbDictionary* pDictionary;
 
-		if (hasDictionary(dictName)) {
+		bool hasObjectFlag;
+		if (hasDictionary(dictName, hasObjectFlag) != Acad::eOk) {
 			return;
+		}
+		else if (hasObjectFlag) {
+			acutPrintf(_T("\n\"%s\" registered."), dictName);
 		}
 
 		try {
@@ -67,8 +71,16 @@ public:
 
 		int error = acedGetString(0, _T("\nEnter employee name: "), customAnswer);
 		if (error != RTNORM) {
-			acutPrintf(_T("\n... has occur some error: %d "), error);
+			acutPrintf(_T("\n... some error occur: %d "), error);
 			return;
+		}
+
+		bool hasObjectFlag;
+		if (hasEntry(dictName, customAnswer, hasObjectFlag) != Acad::eOk) {
+			return;
+		}
+		else if (hasObjectFlag) {
+			acutPrintf(_T("\nWarning: \"%s\" registered."), customAnswer);
 		}
 
 		try {
@@ -77,14 +89,13 @@ public:
 			}
 		}
 		catch (const std::exception&) {
-			//acutPrintf(_T("\nError: Can't add \"%s\" to \"%s\"."), customAnswer, dictName);
 		}
 	}
 
 	static void Step04_listentries() {
 
 		const TCHAR* dictName{ L"EMPLOYEE_DICTIONARY" };
-		
+
 		listentries(dictName);
 	}
 
@@ -92,6 +103,12 @@ public:
 
 		const TCHAR* dictName{ L"EMPLOYEE_DICTIONARY" };
 		TCHAR customAnswer[128];
+
+		bool hasObjectFlag;
+		if (hasDictionary(dictName, hasObjectFlag) != Acad::eOk) {
+			acutPrintf(_T("\nWarning: Can't find \"%s\" dictionary."), dictName);
+			return;
+		}
 
 		int error = acedGetString(0, _T("\nEnter employee name: "), customAnswer);
 		if (error != RTNORM) {

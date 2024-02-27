@@ -8,13 +8,16 @@ getNamedObjectsDictionary
 Acad::ErrorStatus
 addDictionary(const ACHAR* dictName, AcDbDictionary*& pDictionary);
 
-bool hasDictionary(const ACHAR* dictName);
+Acad::ErrorStatus
+hasDictionary(const ACHAR* dictName, bool& hasObjectFlag);
 
 Acad::ErrorStatus
 getDictionary(const ACHAR* dictName, AcDbDictionary*& pDictionary,
 	AcDb::OpenMode mode = AcDb::kForRead);
 
-bool hasEntry(const ACHAR* dictName, const ACHAR* entryName);
+Acad::ErrorStatus
+hasEntry
+(const ACHAR* dictName, const ACHAR* entryName, bool& hasObjectFlag);
 
 Acad::ErrorStatus
 addEntry(const ACHAR* dictName, const ACHAR* entryName);

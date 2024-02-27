@@ -17,7 +17,8 @@ getNamedObjectsDictionary(AcDbDictionary*& pNODictionary, AcDb::OpenMode mode) {
 	return errStat;
 }
 
-bool hasDictionary(const ACHAR* dictName) {
+Acad::ErrorStatus
+hasDictionary(const ACHAR* dictName, bool& hasObjectFlag) {
 
 	Acad::ErrorStatus errStat;
 	AcDbDictionary* pNODictionary;
@@ -27,10 +28,10 @@ bool hasDictionary(const ACHAR* dictName) {
 		return errStat;
 
 	AcDbObjectId id;
-	bool hasObjectFlag = pNODictionary->has(dictName);
+	hasObjectFlag = pNODictionary->has(dictName);
 	pNODictionary->close();
 
-	return hasObjectFlag;
+	return Acad::eOk;
 
 	//if (errStat == Acad::eOk) {
 	//	acutPrintf(_T("\nWarning: \"%s\" registered."), dictName);
@@ -91,6 +92,8 @@ getDictionary(const ACHAR* dictName, AcDbDictionary*& pDictionary, AcDb::OpenMod
 	AcDbObjectId id;
 
 	errStat = pNODictionary->getAt(dictName, pDictionary, mode);
+	pNODictionary->close();
+
 	if (errStat != Acad::eOk) {
 		acutPrintf(_T("\nError: Can't open \"%s\" dictionary"), dictName);
 		return errStat;
@@ -99,7 +102,8 @@ getDictionary(const ACHAR* dictName, AcDbDictionary*& pDictionary, AcDb::OpenMod
 	return errStat;
 }
 
-bool hasEntry(const ACHAR* dictName, const ACHAR* entryName) {
+Acad::ErrorStatus
+hasEntry(const ACHAR* dictName, const ACHAR* entryName, bool& hasObjectFlag) {
 
 	Acad::ErrorStatus errStat;
 	AcDbDictionary* pDictionary;
@@ -110,10 +114,10 @@ bool hasEntry(const ACHAR* dictName, const ACHAR* entryName) {
 	}
 
 	AcDbObjectId id;
-	bool hasObjectFlag = pDictionary->has(entryName);
+	hasObjectFlag = pDictionary->has(entryName);
 	pDictionary->close();
 
-	return hasObjectFlag;
+	return Acad::eOk;
 
 	//if (errStat == Acad::eOk) {
 	//	acutPrintf(_T("\nWarning: \"%s\" registered."), entryName);
@@ -129,11 +133,16 @@ bool hasEntry(const ACHAR* dictName, const ACHAR* entryName) {
 Acad::ErrorStatus
 addEntry(const ACHAR* dictName, const ACHAR* entryName) {
 
-	if (hasEntry(dictName, entryName)) {
+	Acad::ErrorStatus errStat;
+	
+	bool hasEntryFlag;
+	if ((errStat = hasEntry(dictName, entryName, hasEntryFlag)) != Acad::eOk) {
+		return errStat;
+	}
+	else if (hasEntryFlag) {
 		return Acad::eOk;
 	}
 
-	Acad::ErrorStatus errStat;
 	AcDbDictionary* pDictionary;
 	errStat = getDictionary(dictName, pDictionary, AcDb::kForWrite);
 	if (errStat != Acad::eOk) {
