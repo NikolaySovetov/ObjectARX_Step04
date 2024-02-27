@@ -8,37 +8,22 @@ getNamedObjectsDictionary
 Acad::ErrorStatus
 addDictionary(const ACHAR* dictName, AcDbDictionary*& pDictionary);
 
-Acad::ErrorStatus
-hasDictionary(const ACHAR* dictName);
-
+bool hasDictionary(const ACHAR* dictName);
 
 Acad::ErrorStatus
 getDictionary(const ACHAR* dictName, AcDbDictionary*& pDictionary,
 	AcDb::OpenMode mode = AcDb::kForRead);
 
-Acad::ErrorStatus
-addEntry(const ACHAR* dictName, const ACHAR* entry);
+bool hasEntry(const ACHAR* dictName, const ACHAR* entryName);
 
 Acad::ErrorStatus
-removeEntry(const ACHAR* dictName, const ACHAR* entry);
+addEntry(const ACHAR* dictName, const ACHAR* entryName);
 
+Acad::ErrorStatus
+removeEntry(const ACHAR* dictName, const ACHAR* entryName);
 
-
-class Dictionary {
-private:
-	//AcDbDictionary* pNODictionary{ nullptr };
-	AcDbDictionary* pDictionary{ nullptr };
-	AcDbObjectId objId{};
-	const ACHAR* dictionaryName{ L"EMPLOYEE_DICTIONARY" };
-
-public:
-	bool hasDictionary() const;
-	void initDictionary();
-	Acad::ErrorStatus addEntry(const ACHAR* entryName);
-	Acad::ErrorStatus removeEntry(const ACHAR* entryName);
-};
-
-
+Acad::ErrorStatus
+listentries(const ACHAR* dictName);
 
 
 

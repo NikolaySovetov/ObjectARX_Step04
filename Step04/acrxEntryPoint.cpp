@@ -45,7 +45,7 @@ public:
 		const TCHAR* dictName{ L"EMPLOYEE_DICTIONARY" };
 		AcDbDictionary* pDictionary;
 
-		if (hasDictionary(dictName) != Acad::eKeyNotFound) {
+		if (hasDictionary(dictName)) {
 			return;
 		}
 
@@ -83,6 +83,9 @@ public:
 
 	static void Step04_listentries() {
 
+		const TCHAR* dictName{ L"EMPLOYEE_DICTIONARY" };
+		
+		listentries(dictName);
 	}
 
 	static void Step04_removeentry() {

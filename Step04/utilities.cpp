@@ -17,8 +17,7 @@ getNamedObjectsDictionary(AcDbDictionary*& pNODictionary, AcDb::OpenMode mode) {
 	return errStat;
 }
 
-Acad::ErrorStatus
-hasDictionary(const ACHAR* dictName) {
+bool hasDictionary(const ACHAR* dictName) {
 
 	Acad::ErrorStatus errStat;
 	AcDbDictionary* pNODictionary;
@@ -28,19 +27,20 @@ hasDictionary(const ACHAR* dictName) {
 		return errStat;
 
 	AcDbObjectId id;
-	errStat = pNODictionary->getAt(dictName, id);
+	bool hasObjectFlag = pNODictionary->has(dictName);
 	pNODictionary->close();
 
-	if (errStat == Acad::eOk) {
-		acutPrintf(_T("\nWarning: \"%s\" registered."), dictName);
-		return errStat;
-	}
-	else if (errStat == Acad::eInvalidKey) {
-		acutPrintf(_T("\nWarning: \"%s\" invalid key."), dictName);
-		return errStat;
-	}
+	return hasObjectFlag;
 
-	return Acad::eKeyNotFound;
+	//if (errStat == Acad::eOk) {
+	//	acutPrintf(_T("\nWarning: \"%s\" registered."), dictName);
+	//	return errStat;
+	//}
+	//else if (errStat == Acad::eInvalidKey) {
+	//	acutPrintf(_T("\nWarning: \"%s\" invalid key."), dictName);
+	//	return errStat;
+	//}
+	//return Acad::eKeyNotFound;
 }
 
 Acad::ErrorStatus
@@ -99,12 +99,42 @@ getDictionary(const ACHAR* dictName, AcDbDictionary*& pDictionary, AcDb::OpenMod
 	return errStat;
 }
 
-Acad::ErrorStatus
-addEntry(const ACHAR* dictName, const ACHAR* entry) {
+bool hasEntry(const ACHAR* dictName, const ACHAR* entryName) {
 
 	Acad::ErrorStatus errStat;
 	AcDbDictionary* pDictionary;
 
+	errStat = getDictionary(dictName, pDictionary, AcDb::kForRead);
+	if (errStat != Acad::eOk) {
+		return errStat;
+	}
+
+	AcDbObjectId id;
+	bool hasObjectFlag = pDictionary->has(entryName);
+	pDictionary->close();
+
+	return hasObjectFlag;
+
+	//if (errStat == Acad::eOk) {
+	//	acutPrintf(_T("\nWarning: \"%s\" registered."), entryName);
+	//	return errStat;
+	//}
+	//else if (errStat == Acad::eInvalidKey) {
+	//	acutPrintf(_T("\nWarning: \"%s\" invalid key."), entryName);
+	//	return errStat;
+	//}
+	//return Acad::eKeyNotFound;
+}
+
+Acad::ErrorStatus
+addEntry(const ACHAR* dictName, const ACHAR* entryName) {
+
+	if (hasEntry(dictName, entryName)) {
+		return Acad::eOk;
+	}
+
+	Acad::ErrorStatus errStat;
+	AcDbDictionary* pDictionary;
 	errStat = getDictionary(dictName, pDictionary, AcDb::kForWrite);
 	if (errStat != Acad::eOk) {
 		return errStat;
@@ -121,10 +151,10 @@ addEntry(const ACHAR* dictName, const ACHAR* entry) {
 	}
 
 	AcDbObjectId id;
-	errStat = pDictionary->setAt(entry, pRecord, id);
+	errStat = pDictionary->setAt(entryName, pRecord, id);
 	pDictionary->close();
 	if (errStat != Acad::eOk) {
-		acutPrintf(_T("\nError: Can't add \"%s\" to \"%s\"."), entry, dictName);
+		acutPrintf(_T("\nError: Can't add \"%s\" to \"%s\"."), entryName, dictName);
 		delete pRecord;
 		return errStat;
 	}
@@ -135,7 +165,7 @@ addEntry(const ACHAR* dictName, const ACHAR* entry) {
 }
 
 Acad::ErrorStatus
-removeEntry(const ACHAR* dictName, const ACHAR* entry) {
+removeEntry(const ACHAR* dictName, const ACHAR* entryName) {
 
 	Acad::ErrorStatus errStat;
 	AcDbDictionary* pDictionary;
@@ -146,93 +176,11 @@ removeEntry(const ACHAR* dictName, const ACHAR* entry) {
 	}
 
 	AcDbObject* pEntryObj;
-	errStat = pDictionary->getAt(entry, pEntryObj, AcDb::kForWrite);
-	pDictionary->close();
-
-	if (errStat != Acad::eOk) {
-		acutPrintf(_T("\nWarning: Can't find \"%s\" in the \"%s\"."), entry, dictName);
-		return errStat;
-	}
-
-	pEntryObj->erase();
-	pEntryObj->close();
-
-	return errStat;
-}
-
-
-
-
-
-
-//-----------------------------------------------------------------
-bool Dictionary::hasDictionary() const {
-
-	return pDictionary != nullptr;
-}
-
-void Dictionary::initDictionary() {
-
-
-}
-
-Acad::ErrorStatus Dictionary::addEntry(const ACHAR* entryName) {
-
-	Acad::ErrorStatus errStat;
-	AcDbObject* pEntryObj;
-
-	// Check if entry is registered
-	errStat = pDictionary->getAt(entryName, pEntryObj, AcDb::kForRead);
-
-	if (errStat == Acad::eInvalidKey) {
-		acutPrintf(L"\nWarning: Key is invalid");
-		return errStat;
-	}
-	else if (errStat == Acad::eOk) {
-		acutPrintf(L"\nWarning: This entry is registered");
-		pEntryObj->close();
-		return errStat;
-	}
-
-	// If not registered then add new empty record
-	errStat = acdbOpenAcDbObject((AcDbObject*&)pDictionary, objId, AcDb::kForWrite);
-
-	if (errStat != Acad::eOk) {
-		acutPrintf(L"\nError: Can't open Dictionary to add new record.");
-		return errStat;
-	}
-
-	AcDbXrecord* pRecord = new AcDbXrecord;
-	AcDbObjectId recordId;
-
-	errStat = pDictionary->setAt(entryName, pRecord, recordId);
-	pDictionary->close();
-
-	if (errStat != Acad::eOk) {
-		acutPrintf(L"\nError: Can't add new record to dictionary.");
-		delete pRecord;
-		return errStat;
-	}
-
-	pRecord->close();
-
-	return errStat;
-}
-
-Acad::ErrorStatus Dictionary::removeEntry(const ACHAR* entryName) {
-
-	Acad::ErrorStatus errStat;
-	AcDbObject* pEntryObj;
-
-	// Check if entry is registered
 	errStat = pDictionary->getAt(entryName, pEntryObj, AcDb::kForWrite);
+	pDictionary->close();
 
-	if (errStat == Acad::eInvalidKey) {
-		acutPrintf(L"\nWarning: Can't remove the entry. Key is invalid.");
-		return errStat;
-	}
-	else if (errStat == Acad::eKeyNotFound) {
-		acutPrintf(L"\nWarning: Can't remove the entry. Key not found.");
+	if (errStat != Acad::eOk) {
+		acutPrintf(_T("\nWarning: Can't find \"%s\" in the \"%s\"."), entryName, dictName);
 		return errStat;
 	}
 
@@ -240,6 +188,32 @@ Acad::ErrorStatus Dictionary::removeEntry(const ACHAR* entryName) {
 	pEntryObj->close();
 
 	return errStat;
+}
+
+Acad::ErrorStatus
+listentries(const ACHAR* dictName) {
+
+	Acad::ErrorStatus errStat;
+	AcDbDictionary* pDictionary;
+
+	errStat = getDictionary(dictName, pDictionary, AcDb::kForRead);
+	if (errStat != Acad::eOk) {
+		return errStat;
+	}
+
+	AcDbDictionaryIterator* pDIterator = pDictionary->newIterator();
+
+	int num{ 1 };
+
+	for (; !pDIterator->done(); pDIterator->next()) {
+		acutPrintf(_T("\n%d. \"%s\"."), num, pDIterator->name());
+		++num;
+	}
+	delete pDIterator;
+
+	pDictionary->close();
+
+	return Acad::eOk;
 }
 
 
