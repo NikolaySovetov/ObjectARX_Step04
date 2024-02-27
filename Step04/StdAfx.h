@@ -6,9 +6,9 @@
 #pragma once
 #define STEP04_MODULE
 
-/*#ifndef
+#ifndef _ALLOW_RTCc_IN_STL
 #define _ALLOW_RTCc_IN_STL
-#endif*/
+#endif
 
 #pragma pack(push, 8)
 #pragma warning(disable : 4786 4996)
@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 #include "DocData.h" //- Your document specific data class holder
-
+#include "tchar.h"
 	//- Declare it as an extern here so that it becomes available in all modules
 extern AcApDataManager<CDocData> DocVars;
 

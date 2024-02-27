@@ -1,29 +1,43 @@
 #pragma once
 #include "StdAfx.h"
 
-inline Acad::ErrorStatus
-getNamedObjectsDictionary(AcDbDictionary*& pNODictionary);
+Acad::ErrorStatus
+getNamedObjectsDictionary
+(AcDbDictionary*& pNODictionary, AcDb::OpenMode mode = AcDb::kForRead);
 
-inline Acad::ErrorStatus
-addDictionary(AcDbDictionary*& pDictionary, AcDbObjectId& id, const ACHAR* name);
+Acad::ErrorStatus
+addDictionary(const ACHAR* dictName, AcDbDictionary*& pDictionary);
 
-inline Acad::ErrorStatus
-hasDictionary(AcDbDictionary*& pDictionary, AcDbObjectId& id, const ACHAR* name);
+Acad::ErrorStatus
+hasDictionary(const ACHAR* dictName);
+
+
+Acad::ErrorStatus
+getDictionary(const ACHAR* dictName, AcDbDictionary*& pDictionary,
+	AcDb::OpenMode mode = AcDb::kForRead);
+
+Acad::ErrorStatus
+addEntry(const ACHAR* dictName, const ACHAR* entry);
+
+Acad::ErrorStatus
+removeEntry(const ACHAR* dictName, const ACHAR* entry);
+
+
 
 class Dictionary {
 private:
+	//AcDbDictionary* pNODictionary{ nullptr };
 	AcDbDictionary* pDictionary{ nullptr };
 	AcDbObjectId objId{};
 	const ACHAR* dictionaryName{ L"EMPLOYEE_DICTIONARY" };
 
 public:
-	inline bool hasDictionary() const;
-	inline void initDictionary();
-	inline Acad::ErrorStatus
-		hasEntry(const ACHAR* entryName, AcDbObject*& entryObj) const;
-	inline Acad::ErrorStatus addEntry(const ACHAR* entryName);
-	inline Acad::ErrorStatus removeEntry(const ACHAR* entryName);
+	bool hasDictionary() const;
+	void initDictionary();
+	Acad::ErrorStatus addEntry(const ACHAR* entryName);
+	Acad::ErrorStatus removeEntry(const ACHAR* entryName);
 };
+
 
 
 
