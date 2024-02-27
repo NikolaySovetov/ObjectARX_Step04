@@ -49,16 +49,21 @@ addDictionary(AcDbDictionary*& pDictionary, AcDbObjectId& id, const ACHAR* name)
 	return errStat;
 }
 
+inline Acad::ErrorStatus
+hasDictionary(AcDbDictionary*& pDictionary, AcDbObjectId& id, const ACHAR* name) {
+
+}
+
 //-----------------------------------------------------------------
 inline bool Dictionary::hasDictionary() const {
 
-	return mPtrDictionary != nullptr;
+	return pDictionary != nullptr;
 }
 
 inline void Dictionary::initDictionary() {
 
-	if (addDictionary(mPtrDictionary, mId, mName) == Acad::eOk) {
-		mPtrDictionary->close();
+	if (addDictionary(pDictionary, objId, dictionaryName) == Acad::eOk) {
+		pDictionary->close();
 	}
 }
 
@@ -66,11 +71,10 @@ inline Acad::ErrorStatus
 Dictionary::hasEntry(const ACHAR* entryName, AcDbObject*& pEntryObj) const {
 
 	Acad::ErrorStatus errStat;
-	//AcDbObject* pEntry;
 
 	// HACK: need I open Dictionary before getAt() ???
-	errStat = mPtrDictionary->getAt(entryName, pEntryObj, AcDb::kForRead);
-	pEntryObj->close();
+	errStat = pDictionary->getAt(entryName, pEntryObj, AcDb::kForRead);
+	//pEntryObj->close();
 
 	if (errStat == Acad::eInvalidKey) {
 		acutPrintf(L"\nWarning: Key is invalid");
@@ -80,8 +84,8 @@ Dictionary::hasEntry(const ACHAR* entryName, AcDbObject*& pEntryObj) const {
 		acutPrintf(L"\nWarning: This entry is registered");
 		return errStat;
 	}
-
-	return errStat;
+ 
+	return Acad::eKeyNotFound;
 }
 
 inline Acad::ErrorStatus Dictionary::addEntry(const ACHAR* entryName) {
@@ -94,9 +98,8 @@ inline Acad::ErrorStatus Dictionary::addEntry(const ACHAR* entryName) {
 		return errStat;
 	}
 
-	//AcDbObject* pDictObj = reinterpret_cast<AcDbObject*>(mPtrDictionary);
-	errStat = acdbOpenAcDbObject(reinterpret_cast<AcDbObject*&>(mPtrDictionary),
-								 mId, AcDb::kForWrite);
+	//AcDbObject* pDictObj = reinterpret_cast<AcDbObject*>(pDictionary);
+	errStat = acdbOpenAcDbObject((AcDbObject*&)pDictionary, objId, AcDb::kForWrite);
 
 	if (errStat != Acad::eOk) {
 		acutPrintf(L"\nError: Can't open Dictionary");
