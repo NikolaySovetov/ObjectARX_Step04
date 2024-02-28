@@ -45,17 +45,8 @@ public:
 		const TCHAR* dictName{ L"EMPLOYEE_DICTIONARY" };
 		AcDbDictionary* pDictionary;
 
-		bool hasObjectFlag;
-		if (hasDictionary(dictName, hasObjectFlag) != Acad::eOk) {
-			return;
-		}
-		else if (hasObjectFlag) {
-			acutPrintf(_T("\n\"%s\" registered."), dictName);
-		}
-
 		try {
 			if (addDictionary(dictName, pDictionary) == Acad::eOk) {
-				pDictionary->close();
 				acutPrintf(_T("\n\"%s\" dictionary was added."), dictName);
 			}
 		}
@@ -73,14 +64,6 @@ public:
 		if (error != RTNORM) {
 			acutPrintf(_T("\n... some error occur: %d "), error);
 			return;
-		}
-
-		bool hasObjectFlag;
-		if (hasEntry(dictName, customAnswer, hasObjectFlag) != Acad::eOk) {
-			return;
-		}
-		else if (hasObjectFlag) {
-			acutPrintf(_T("\nWarning: \"%s\" registered."), customAnswer);
 		}
 
 		try {
@@ -103,12 +86,6 @@ public:
 
 		const TCHAR* dictName{ L"EMPLOYEE_DICTIONARY" };
 		TCHAR customAnswer[128];
-
-		bool hasObjectFlag;
-		if (hasDictionary(dictName, hasObjectFlag) != Acad::eOk) {
-			acutPrintf(_T("\nWarning: Can't find \"%s\" dictionary."), dictName);
-			return;
-		}
 
 		int error = acedGetString(0, _T("\nEnter employee name: "), customAnswer);
 		if (error != RTNORM) {
